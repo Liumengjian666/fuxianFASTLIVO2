@@ -1,0 +1,114 @@
+# -----------------------------
+# HILTI 备份配置
+# -----------------------------
+common:
+  # 传感器话题与开关
+  img_topic: "/alphasense/cam0/image_raw"
+  lid_topic: "/livox/lidar"
+  imu_topic: "/os_cloud_node/imu"
+  img_en: 1
+  lidar_en: 1
+  ros_driver_bug_fix: false
+
+extrin_calib:
+  # Hilti-2022 外参
+  extrinsic_T: [-0.001, -0.00855, 0.055] 
+  extrinsic_R: [0, -1, 0, -1, 0, 0, 0, 0, -1]
+  
+  # Hilti-2023 外参（备用）
+  # extrinsic_T: [-0.006730146149038548, -0.006897049862999071, 0.049898628062256645] 
+  # extrinsic_R: [0.006609639848469365, -0.9999773650294649, 0.0012578115132016717, 
+  #               -0.9999762249571927, -0.006612093869054189, -0.0019569708811106104, 
+  #               0.001965243352927244, -0.0012448467359610184, -0.9999972940839232]
+
+  # Hilti 相机-激光外参
+  Rcl: [ -0.999926,  -0.00670802, 0.0101073,
+         -0.0100912, -0.00242564, -0.999946,
+          0.00673218,-0.999975, 0.00235777 ]
+  Pcl: [ -0.0549762, 0.0675401, -0.0520599 ]
+
+time_offset:
+  # 时间偏移补偿
+  imu_time_offset: 0.0
+  img_time_offset: 0.0
+  exposure_time_init: 0.0
+
+preprocess:
+  # 点云预处理
+  hilti_en: true
+  point_filter_num: 1
+  filter_size_surf: 0.1 # 0.2
+  lidar_type: 1 # Livox Avia LiDAR (CustomMsg format)
+  scan_line: 6
+  blind: 0.8 # 0.1 0.3
+ 
+vio:
+  # 视觉里程计参数
+  max_iterations: 5
+  outlier_threshold: 500
+  img_point_cov: 1000
+  patch_size: 8
+  patch_pyrimid_level: 4
+  normal_en: true
+  raycast_en: false
+  inverse_composition_en: false
+  exposure_estimate_en: true
+  inv_expo_cov: 0.1
+
+imu:
+  # IMU 参数
+  imu_en: true
+  imu_int_frame: 30
+  acc_cov: 0.5 # 0.1
+  gyr_cov: 0.01
+  b_acc_cov: 0.0001 # 0.1
+  b_gyr_cov: 0.0001 # 0.1
+
+lio:
+  # 激光里程计参数
+  max_iterations: 5
+  dept_err: 0.02
+  beam_err: 0.05
+  min_eigen_value: 0.0001 # 0.0025
+  voxel_size: 0.4
+  max_layer: 2
+  max_points_num: 100
+  layer_init_num: [5, 5, 5, 5, 5]
+
+local_map:  
+  # 局部地图参数
+  map_sliding_en: false
+  half_map_size: 100
+  sliding_thresh: 8
+
+uav:
+  imu_rate_odom: false
+  gravity_align_en: false
+
+publish:
+  # 发布控制
+  dense_map_en: true
+  pub_effect_point_en: false 
+  pub_plane_en: false
+  pub_scan_num: 1
+  blind_rgb_points: 0.0
+
+evo:
+  # 轨迹输出
+  seq_name: "exp09_cupola"
+  pose_output_en: true
+
+pcd_save:
+  # PCD 保存配置
+  pcd_save_en: false
+  type: 0 # 0: World Frame, 1: Body Frame;
+  colmap_output_en: false
+  filter_size_pcd: 0.15
+  interval: -1
+  # 每个 pcd 文件包含多少 LiDAR 帧
+  # -1: 全部帧写入单个文件（长序列可能占内存）
+
+image_save:
+  # 图像保存配置
+  img_save_en: false
+  interval: 1

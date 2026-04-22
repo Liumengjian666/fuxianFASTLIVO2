@@ -1,0 +1,102 @@
+# ==================== 完整启动流程 ====================
+
+# 【步骤1】打开 VSCode（如果还没打开）
+code /home/liumengjian/catkin_ws/src/FAST-LIVO2
+
+# 【步骤2】在 VSCode 内置终端中，source ROS 环境和工作空间
+source /opt/ros/noetic/setup.bash
+source /home/liumengjian/catkin_ws/devel/setup.bash
+
+# 【步骤3】编译项目（如果代码有修改或首次编译）
+cd /home/liumengjian/catkin_ws
+catkin_make -j2
+source devel/setup.bash
+
+# 【步骤4】启动 roscore（新开一个终端）
+roscore
+
+
+# 【步骤5】启动 FAST-LIVO2 节点（回到 VSCode 终端或新开终端）
+source /opt/ros/noetic/setup.bash
+source /home/liumengjian/catkin_ws/devel/setup.bash
+roslaunch fast_livo mapping_m2dgr_street.launch rviz:=false
+
+
+# 【步骤6】启动图像解压节点（新开终端，记得先 source）
+source /opt/ros/noetic/setup.bash
+source /home/liumengjian/catkin_ws/devel/setup.bash
+rosrun image_transport republish compressed in:=/camera/color/image_raw/compressed raw out:=/camera/color/image_raw
+
+# 【步骤7】播放 bag 包（新开终端）
+rosbag play /home/liumengjian/datasets/LVO/street_03.bag -u 50 -r 0.5
+# 不建议用 -r 1 直接全速播放，容易导致时序压力和轨迹发散
+
+# ==================== 停止流程 ===========
+
+# 【方法1】一键停止所有 ROS 相关进程
+pkill -9 -f "ros|rviz" && sleep 1
+
+# 【方法2】如果还有残留，强制清理
+kill -9 $(pgrep -f rosmaster) 2>/dev/null
+kill -9 $(pgrep -f rosout) 2>/dev/null
+ps aux | grep -E "ros|rviz" | grep -v grep
+
+# ==================== 查看结果 ====================
+
+# 【查看保存的点云】
+pcl_viewer /home/liumengjian/catkin_ws/src/FAST-LIVO2/Log/pcd/all_raw_points.pcd
+# 按键盘数字键 5 切换 RGB 颜色模式
+
+# 【或者使用 Open3D 验证点云文件】
+python3 -c "import open3d as o3d; pcd=o3d.io.read_point_cloud('/home/liumengjian/catkin_ws/src/FAST-LIVO2/Log/pcd/all_raw_points.pcd'); o3d.visualization.draw_geometries([pcd])"
+
+# 【查看位姿输出】
+cat /home/liumengjian/catkin_ws/src/FAST-LIVO2/Log/result/*.txt
+
+# ==================== 常用检查命令 ====================
+
+# 检查话题列表
+rostopic list
+
+# 检查特定话题是否有数据
+rostopic echo /cloud_registered -n 1
+
+# 查看当前运行的 ROS 节点
+rosnode list
+
+# 查看系统资源占用
+htop
+
+
+
+# ==================== 评估并保存 .log（推荐） ====================
+
+# 方式A：NTU_VIRAL 按序列名一键评估并落盘日志
+cd /home/liumengjian/catkin_ws/src/FAST-LIVO2/Log/result/ntu_viral
+SEQ=eee_01
+
+# APE 日志（会新建或覆盖 ape_${SEQ}.log）
+python3 -m evo.main_ape tum ${SEQ}_gt.txt ${SEQ}_prism.txt -a > ape_${SEQ}.log 2>&1
+
+# RPE 日志（会新建或覆盖 rpe_${SEQ}.log）
+python3 -m evo.main_rpe tum ${SEQ}_gt.txt ${SEQ}_prism.txt -a --pose_relation trans_part > rpe_${SEQ}.log 2>&1
+
+# 查看日志中的关键指标
+echo "--- APE ---"
+sed -n '1,40p' ape_${SEQ}.log
+echo "--- RPE ---"
+sed -n '1,50p' rpe_${SEQ}.log
+
+# 方式B：任意 GT/估计轨迹文件（文件名不按 xxx_xx 规则也可）
+GT=/abs/path/to/your_gt.txt
+EST=/abs/path/to/your_est.txt
+TAG=my_seq
+
+python3 -m evo.main_ape tum "$GT" "$EST" -a > ape_${TAG}.log 2>&1
+python3 -m evo.main_rpe tum "$GT" "$EST" -a --pose_relation trans_part > rpe_${TAG}.log 2>&1
+
+# 说明（换数据时主要替换这几处）：
+# 1) SEQ：如果你在 ntu_viral 目录下按 xxx_xx 命名，改 SEQ 即可（如 eee_02 / nya_03 / sbs_01）。
+# 2) GT、EST：如果是自定义路径，直接替换为你的真值和估计轨迹文件。
+# 3) TAG：仅用于日志文件命名，便于区分不同实验。
+# 4) 若希望追加日志而不是覆盖，把 "> xxx.log" 改成 ">> xxx.log"。

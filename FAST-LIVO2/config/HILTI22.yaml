@@ -1,0 +1,121 @@
+# -----------------------------
+# HILTI22 数据集配置
+# -----------------------------
+common:
+  # 传感器开关与话题
+  img_en: 1
+  img_topic: /alphasense/cam0/image_raw
+  imu_topic: /alphasense/imu
+  lid_topic: /livox/lidar
+  lidar_en: 1
+  ros_driver_bug_fix: false
+evo:
+  # 轨迹输出
+  pose_output_en: true
+  seq_name: exp09_cupola
+extrin_calib:
+  # 外参配置
+  Pcl:
+  - 0
+  - 0
+  - 0
+  Rcl:
+  - 1
+  - 0
+  - 0
+  - 0
+  - 1
+  - 0
+  - 0
+  - 0
+  - 1
+  extrinsic_R:
+  - 0
+  - -1
+  - 0
+  - -1
+  - 0
+  - 0
+  - 0
+  - 0
+  - -1
+  extrinsic_T:
+  - -0.001
+  - -0.00855
+  - 0.055
+image_save:
+  # 图像保存配置
+  img_save_en: false
+  interval: 1
+imu:
+  # IMU 参数
+  acc_cov: 0.5
+  b_acc_cov: 0.0001
+  b_gyr_cov: 0.0001
+  gyr_cov: 0.01
+  imu_en: true
+  imu_int_frame: 30
+lio:
+  # 激光里程计参数
+  beam_err: 0.05
+  dept_err: 0.02
+  layer_init_num:
+  - 5
+  - 5
+  - 5
+  - 5
+  - 5
+  max_iterations: 5
+  max_layer: 2
+  max_points_num: 100
+  min_eigen_value: 0.0001
+  voxel_size: 0.4
+local_map:
+  # 局部地图参数
+  half_map_size: 100
+  map_sliding_en: false
+  sliding_thresh: 8
+pcd_save:
+  # PCD 保存配置
+  colmap_output_en: false
+  filter_size_pcd: 0.15
+  interval: -1
+  pcd_save_en: false
+  type: 0
+preprocess:
+  # 点云预处理
+  blind: 0.8
+  filter_size_surf: 0.1
+  hilti_en: true
+  lidar_type: 1
+  point_filter_num: 1
+  scan_line: 6
+publish:
+  # 发布控制
+  blind_rgb_points: 0.0
+  dense_map_en: true
+  pub_effect_point_en: false
+  pub_plane_en: false
+  pub_scan_num: 1
+time_offset:
+  # 时间补偿
+  exposure_time_init: 0.0
+  img_time_offset: 0.0
+  imu_time_offset: -161.0  # HILTI数据集IMU时间偏移补偿
+
+uav:
+  # UAV 相关选项
+  gravity_align_en: false
+  imu_rate_odom: false
+vio:
+  # 视觉里程计参数
+  exposure_estimate_en: true
+  img_point_cov: 1000
+  inv_expo_cov: 0.1
+  inverse_composition_en: false
+  max_iterations: 5
+  normal_en: true
+  outlier_threshold: 500
+  patch_pyrimid_level: 4
+  patch_size: 8
+  raycast_en: false

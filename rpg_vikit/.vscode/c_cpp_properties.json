@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/vikit_common/include",
+                "${workspaceFolder}/vikit_ros/include",
+                "/usr/local/include/eigen3",
+                "/usr/include/eigen3",
+                "/usr/local/include",
+                "/usr/include",
+                "/usr/local/include/sophus",
+                "/usr/include/pcl-1.10",
+                "/usr/include/opencv4",
+                "/opt/ros/noetic/include",
+                "/home/liumengjian/catkin_ws/devel/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-x64",
+            "compileCommands": "/home/liumengjian/catkin_ws/build/compile_commands.json"
+        }
+    ],
+    "version": 4
+}
